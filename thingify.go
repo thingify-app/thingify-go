@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	thingrtc "github.com/thingify-app/thing-rtc-go"
+	schema "github.com/thingify-app/thingify-schema/golang"
+	"google.golang.org/protobuf/proto"
 )
 
 func main() {
@@ -23,6 +25,12 @@ func main() {
 	})
 	peer.OnBinaryMessage(func(message []byte) {
 		fmt.Printf("Binary message received: %v\n", message)
+		cmd, err := parseCommand(message)
+		if err != nil {
+			fmt.Printf("Error parsing command: %v\n", err)
+			return
+		}
+		fmt.Printf("Command received: %v, %v\n", cmd.ValueL, cmd.ValueR)
 	})
 
 	err := peer.Connect(tokenGenerator)
@@ -32,4 +40,10 @@ func main() {
 	defer peer.Disconnect()
 
 	select {}
+}
+
+func parseCommand(bytes []byte) (schema.Command, error) {
+	command := schema.Command{}
+	err := proto.Unmarshal(bytes, &command)
+	return command, err
 }
