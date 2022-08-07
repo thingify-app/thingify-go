@@ -6,6 +6,9 @@ import (
 	thingrtc "github.com/thingify-app/thing-rtc-go"
 	schema "github.com/thingify-app/thingify-schema/golang"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/thingify-app/thing-rtc-go/codec/mmal"
+	_ "github.com/thingify-app/thing-rtc-go/driver/camera"
 )
 
 func main() {
@@ -14,7 +17,13 @@ func main() {
 		ResponderId: "123",
 	}
 
-	peer := thingrtc.NewPeer("wss://thingify-test.herokuapp.com")
+	videoSource := thingrtc.CreateVideoMediaSource(640, 480)
+	codec, err := mmal.NewCodec(1_000_000)
+	if err != nil {
+		panic(err)
+	}
+
+	peer := thingrtc.NewPeer("wss://thingify-test.herokuapp.com", codec, videoSource)
 
 	peer.OnConnectionStateChange(func(connectionState int) {
 		fmt.Printf("Connection state changed: %v", connectionState)
@@ -33,7 +42,7 @@ func main() {
 		fmt.Printf("Command received: %v, %v\n", cmd.ValueL, cmd.ValueR)
 	})
 
-	err := peer.Connect(tokenGenerator)
+	err = peer.Connect(tokenGenerator)
 	if err != nil {
 		panic(err)
 	}
