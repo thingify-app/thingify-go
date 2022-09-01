@@ -12,6 +12,12 @@ import (
 )
 
 func main() {
+	spi, err := InitSpi()
+	if err != nil {
+		panic(err)
+	}
+	defer spi.Close()
+
 	tokenGenerator := thingrtc.BasicTokenGenerator{
 		Role:        "responder",
 		ResponderId: "123",
@@ -29,17 +35,18 @@ func main() {
 		fmt.Printf("Connection state changed: %v", connectionState)
 	})
 
-	peer.OnStringMessage(func(message string) {
-		fmt.Printf("String message received: %v\n", message)
-	})
 	peer.OnBinaryMessage(func(message []byte) {
-		fmt.Printf("Binary message received: %v\n", message)
 		cmd, err := parseCommand(message)
 		if err != nil {
 			fmt.Printf("Error parsing command: %v\n", err)
 			return
 		}
 		fmt.Printf("Command received: %v, %v\n", cmd.ValueL, cmd.ValueR)
+
+		err = spi.WritePwm(byte(cmd.ValueL), byte(cmd.ValueR))
+		if err != nil {
+			fmt.Printf("Error writing PWM: %v\n", err)
+		}
 	})
 
 	err = peer.Connect(tokenGenerator)
