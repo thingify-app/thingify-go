@@ -77,10 +77,7 @@ func connect(spi *Spi, tokenGenerator thingrtc.TokenGenerator) {
 		}
 	})
 
-	err = peer.Connect(tokenGenerator)
-	if err != nil {
-		panic(err)
-	}
+	peer.Connect(tokenGenerator)
 	defer peer.Disconnect()
 
 	select {}
