@@ -19,8 +19,8 @@ import (
 	_ "github.com/thingify-app/thing-rtc-go/driver/camera"
 )
 
-const PAIRING_SERVER_URL = "https://thingify-xpo4wgiz5a-ts.a.run.app/pairing"
-const SIGNALLING_SERVER_URL = "wss://thingify-xpo4wgiz5a-ts.a.run.app/signalling"
+const PAIRING_SERVER_URL = "https://thingify.deno.dev/pairing"
+const SIGNALLING_SERVER_URL = "wss://thingify.deno.dev/signalling"
 
 func main() {
 	spi, err := InitSpi()
@@ -52,7 +52,7 @@ func main() {
 
 func connect(spi *Spi, tokenGenerator thingrtc.TokenGenerator) {
 	videoSource := thingrtc.CreateVideoMediaSource(640, 480)
-	codec, err := mmal.NewCodec(1_000_000)
+	codec, err := mmal.NewCodec(400_000)
 	if err != nil {
 		panic(err)
 	}
@@ -69,7 +69,6 @@ func connect(spi *Spi, tokenGenerator thingrtc.TokenGenerator) {
 			fmt.Printf("Error parsing command: %v\n", err)
 			return
 		}
-		fmt.Printf("Command received: %v, %v\n", cmd.ValueL, cmd.ValueR)
 
 		err = spi.WritePwm(byte(cmd.ValueL), byte(cmd.ValueR))
 		if err != nil {

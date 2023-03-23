@@ -109,6 +109,8 @@ github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKs
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/thingify-app/thing-rtc-go v0.0.0-20221228014348-08feffac3631 h1:9vzyxnDYQ1utdzljyYH39Axpe5miNluxdSs/QsFW9Bg=
 github.com/thingify-app/thing-rtc-go v0.0.0-20221228014348-08feffac3631/go.mod h1:5p0o3F2JhdHu/lI8PVhuJS1xgXmhiF8dFn0b/vzgSiw=
+github.com/thingify-app/thing-rtc-go v0.0.0-20230123230901-ffba2099c7d7 h1:Ns4m4oBq2ZJw0FVHsjXQb2IOAWDvY+BfaeShATKSqsI=
+github.com/thingify-app/thing-rtc-go v0.0.0-20230123230901-ffba2099c7d7/go.mod h1:5p0o3F2JhdHu/lI8PVhuJS1xgXmhiF8dFn0b/vzgSiw=
 github.com/thingify-app/thingify-schema/golang v0.0.0-20220609115809-8e6d6618773b h1:XUSWWjOhrumC8jgLzrEHgBClqGs7w6yWLFiFOQ77J4E=
 github.com/thingify-app/thingify-schema/golang v0.0.0-20220609115809-8e6d6618773b/go.mod h1:PGOsDcu8QkNd4HPn4n4kEnN1S0THUleFDBtf8+lLLEI=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
