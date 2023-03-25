@@ -3,6 +3,7 @@ module github.com/thingify-app/thingify-go
 go 1.16
 
 require (
+	github.com/godbus/dbus/v5 v5.1.0
 	github.com/makiuchi-d/gozxing v0.1.1
 	github.com/pion/mediadevices v0.3.12
 	github.com/thingify-app/thing-rtc-go v0.0.0-20230123230901-ffba2099c7d7

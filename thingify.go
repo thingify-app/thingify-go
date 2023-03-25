@@ -76,6 +76,8 @@ func connect(spi *Spi, tokenGenerator thingrtc.TokenGenerator) {
 		}
 	})
 
+	sendLocationMessages(peer)
+
 	peer.Connect(tokenGenerator)
 	defer peer.Disconnect()
 
@@ -86,6 +88,50 @@ func parseCommand(bytes []byte) (schema.Command, error) {
 	command := schema.Command{}
 	err := proto.Unmarshal(bytes, &command)
 	return command, err
+}
+
+func sendLocationMessages(peer thingrtc.Peer) {
+	modem, err := NewModem()
+	if err != nil {
+		panic(err)
+	}
+
+	err = modem.SetupLocation()
+	if err != nil {
+		panic(err)
+	}
+
+	go func() {
+		for range time.Tick(time.Second * 1) {
+			location, err := modem.GetLocation()
+			if err != nil {
+				fmt.Printf("Error getting location: %v\n", err)
+				// Ignore any error
+				continue
+			}
+
+			locationMessage := schema.LocationMessage{
+				Latitude:  location.Latitude,
+				Longitude: location.Longitude,
+				Bearing:   0,
+				Speed:     0,
+			}
+
+			message := schema.Message{
+				Messages: &schema.Message_Location{
+					Location: &locationMessage,
+				},
+			}
+
+			messageBytes, err := proto.Marshal(&message)
+			if err != nil {
+				fmt.Printf("Error marshalling location: %v\n", err)
+				continue
+			}
+
+			peer.SendBinaryMessage(messageBytes)
+		}
+	}()
 }
 
 func doPairing(pairing *thingrtc_pairing.Pairing) {
