@@ -52,7 +52,7 @@ func main() {
 
 func connect(spi *Spi, tokenGenerator thingrtc.TokenGenerator) {
 	videoSource := thingrtc.CreateVideoMediaSource(640, 480)
-	codec, err := mmal.NewCodec(400_000)
+	codec, err := mmal.NewCodec(1_000_000)
 	if err != nil {
 		panic(err)
 	}
