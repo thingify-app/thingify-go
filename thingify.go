@@ -84,21 +84,23 @@ func connect(spi *Spi, tokenGenerator thingrtc.TokenGenerator) {
 	select {}
 }
 
-func parseCommand(bytes []byte) (schema.Command, error) {
-	command := schema.Command{}
-	err := proto.Unmarshal(bytes, &command)
+func parseCommand(bytes []byte) (*schema.Command, error) {
+	command := &schema.Command{}
+	err := proto.Unmarshal(bytes, command)
 	return command, err
 }
 
 func sendLocationMessages(peer thingrtc.Peer) {
+	locationAvailable := true
+
 	modem, err := NewModem()
 	if err != nil {
-		panic(err)
+		locationAvailable = false
 	}
 
 	err = modem.SetupLocation()
 	if err != nil {
-		panic(err)
+		locationAvailable = false
 	}
 
 	go func() {
@@ -106,11 +108,11 @@ func sendLocationMessages(peer thingrtc.Peer) {
 			location, err := modem.GetLocation()
 			if err != nil {
 				fmt.Printf("Error getting location: %v\n", err)
-				// Ignore any error
-				continue
+				locationAvailable = false
 			}
 
 			locationMessage := schema.LocationMessage{
+				Available: locationAvailable,
 				Latitude:  location.Latitude,
 				Longitude: location.Longitude,
 				Bearing:   0,

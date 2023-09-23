@@ -10,6 +10,11 @@ As this repo depends on private GitHub repos, the following initial setup is req
   [url "ssh://git@github.com/"]
   	insteadOf = https://github.com/
   ```
+- If the SSH key is password-protected, it should be added to the ssh-agent first:
+  ```
+  ssh-agent bash
+  ssh-add ~/.ssh/<key_filename>
+  ```
 - Configure Go to treat all repos within `github.com/thingify-app/` as private. This just disables the use of the central Go package proxy:
   ```
   go env -w GOPRIVATE=github.com/thingify-app/*
