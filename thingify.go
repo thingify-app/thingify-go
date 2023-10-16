@@ -96,44 +96,54 @@ func sendLocationMessages(peer thingrtc.Peer) {
 	modem, err := NewModem()
 	if err != nil {
 		locationAvailable = false
-	}
-
-	err = modem.SetupLocation()
-	if err != nil {
-		locationAvailable = false
+	} else {
+		err = modem.SetupLocation()
+		if err != nil {
+			locationAvailable = false
+		}
 	}
 
 	go func() {
 		for range time.Tick(time.Second * 1) {
-			location, err := modem.GetLocation()
-			if err != nil {
-				fmt.Printf("Error getting location: %v\n", err)
-				locationAvailable = false
+			if locationAvailable {
+				location, err := modem.GetLocation()
+				if err != nil {
+					fmt.Printf("Error getting location: %v\n", err)
+					sendLocationMessage(peer, 0, 0, false)
+				} else {
+					sendLocationMessage(peer, location.Latitude, location.Longitude, true)
+				}
+			} else {
+				sendLocationMessage(peer, 0, 0, false)
 			}
-
-			locationMessage := schema.LocationMessage{
-				Available: locationAvailable,
-				Latitude:  location.Latitude,
-				Longitude: location.Longitude,
-				Bearing:   0,
-				Speed:     0,
-			}
-
-			message := schema.Message{
-				Messages: &schema.Message_Location{
-					Location: &locationMessage,
-				},
-			}
-
-			messageBytes, err := proto.Marshal(&message)
-			if err != nil {
-				fmt.Printf("Error marshalling location: %v\n", err)
-				continue
-			}
-
-			peer.SendBinaryMessage(messageBytes)
 		}
 	}()
+}
+
+func sendLocationMessage(peer thingrtc.Peer, lat float64, lng float64, available bool) {
+	locationMessage := schema.LocationMessage{
+		Available: available,
+		Latitude:  lat,
+		Longitude: lng,
+		Bearing:   0,
+		Speed:     0,
+	}
+
+	message := schema.Message{
+		Messages: &schema.Message_Location{
+			Location: &locationMessage,
+		},
+	}
+	sendMessage(peer, &message)
+}
+
+func sendMessage(peer thingrtc.Peer, message *schema.Message) {
+	messageBytes, err := proto.Marshal(message)
+	if err != nil {
+		fmt.Printf("Error marshalling message: %v\n", err)
+	} else {
+		peer.SendBinaryMessage(messageBytes)
+	}
 }
 
 func doPairing(pairing *thingrtc_pairing.Pairing) {
