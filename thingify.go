@@ -93,20 +93,15 @@ func parseCommand(bytes []byte) (*schema.Command, error) {
 func sendLocationMessages(peer thingrtc.Peer) {
 	locationAvailable := true
 
-	modem, err := NewModem()
+	locationProvider, err := SelectLocationProvider()
 	if err != nil {
 		locationAvailable = false
-	} else {
-		err = modem.SetupLocation()
-		if err != nil {
-			locationAvailable = false
-		}
 	}
 
 	go func() {
 		for range time.Tick(time.Second * 1) {
 			if locationAvailable {
-				location, err := modem.GetLocation()
+				location, err := locationProvider.GetLocation()
 				if err != nil {
 					fmt.Printf("Error getting location: %v\n", err)
 					sendLocationMessage(peer, 0, 0, false)

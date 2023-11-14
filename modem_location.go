@@ -22,17 +22,7 @@ const (
 
 // Simplified ModemManager interface (based on github.com/maltegrosse/go-modemmanager).
 // Not using that library due to a bug in parsing location.
-type Modem interface {
-	SetupLocation() error
-	GetLocation() (Location, error)
-}
-
-type Location struct {
-	Latitude  float64
-	Longitude float64
-}
-
-func NewModem() (Modem, error) {
+func NewModemLocationProvider() (LocationProvider, error) {
 	conn, err := dbus.SystemBus()
 	if err != nil {
 		return nil, err
@@ -57,8 +47,14 @@ func NewModem() (Modem, error) {
 	}
 
 	modemObj := conn.Object(ModemManagerInterface, modemPaths[0])
+	modem := &modem{modemObj}
 
-	return &modem{modemObj}, nil
+	err = modem.setupLocation()
+	if err != nil {
+		return nil, err
+	}
+
+	return modem, nil
 }
 
 type modem struct {
@@ -73,7 +69,7 @@ func (m *modem) callWithReturn(ret interface{}, method string, args ...interface
 	return m.modemObj.Call(method, 0, args...).Store(ret)
 }
 
-func (m *modem) SetupLocation() error {
+func (m *modem) setupLocation() error {
 	return m.call(ModemLocationSetup, MmModemLocationSourceGpsRaw, false)
 }
 
